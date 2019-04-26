@@ -12,8 +12,8 @@
 			return { 
 				DataShape: 'TimeSeries',
 				DataQueryMode: 3,
-				Height: 150,
-				Width: 150 
+				Height: 400,
+				Width: 800 
 			} 
 		}
 	}
@@ -22,7 +22,24 @@
 
 		this.onDataUpdate = dataUpdate;
 		
+		var labels = [];
 		var firstLoad = true;
+		
+		var layout = {
+		  title: {
+			 text: 'Fan vibration'
+		  },
+		  displayModeBar: false,
+		  xaxis: {
+			visible: false
+		  },
+		  margin:{
+			  t:40,
+			  b:0,
+			  pad:0
+			}
+		  
+		};
 	
 		function dataUpdate(data)
 		{
@@ -30,43 +47,35 @@
 			
 			if(!data)
 				return;
-				
+			if(labels.length != data.Data.length)
+					labels = [];
 			
 			let plotData = [];
+			
 			for(var dl = 0; dl < data.Data.length; dl++)
 			{
 				let dataValues = data.Data[dl].Values.map(function(v){return v.Value});
+				if(data.Data[dl].Label)
+				{
+					
+					labels[dl] = data.Data[dl].Label.split('|')[0]
+					
+				}
+					
 				plotData[dl] = {
 					y: dataValues,
-					type: 'box'
-					
+					type: 'box',
+					name: labels[dl],
+					boxmean: 'sd'
 				}
 			}
 			
-			var y0 = [];
-			var y1 = [];
-			for (var i = 0; i < 50; i ++) {
-				y0[i] = Math.random();
-				y1[i] = Math.random() + 1;
-			}
-
-			var trace1 = {
-			  y: y0,
-			  type: 'box'
-			};
-
-			var trace2 = {
-			  y: y1,
-			  type: 'box'
-			};
-
-			//var data = [trace1, trace2];
-
+		
 			
 			if(firstLoad)
-				Plotly.newPlot('myDiv', plotData);
+				Plotly.newPlot('myDiv', plotData, layout);
 			else
-				Plotrly.react('myDiv', plotData);
+				Plotrly.react('myDiv', plotData, layout);
 			
 		}
 
